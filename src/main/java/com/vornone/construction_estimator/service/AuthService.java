@@ -46,13 +46,22 @@ public class AuthService {
     }
 
     public AuthDTO.LoginResponse login(AuthDTO.LoginRequest req) {
+        log.info("Login attempt for email: '{}'", req.email());
+
         User user = userRepository.findByEmail(req.email())
                 .orElseThrow(() -> {
                     log.warn("User not found: {}", req.email());
                     return new RuntimeException("Invalid email or password");
                 });
 
-        if (!passwordEncoder.matches(req.password(), user.getPassword())) {
+        log.info("Found user: {}", user.getUsername());
+        log.info("Stored password hash: {}", user.getPassword()); // Add this
+        log.info("Input password: {}", req.password()); // Add this
+
+        boolean matches = passwordEncoder.matches(req.password(), user.getPassword());
+        log.info("Password matches: {}", matches); // Add this
+
+        if (!matches) {
             log.warn("Invalid password for user: {}", req.email());
             throw new RuntimeException("Invalid email or password");
         }

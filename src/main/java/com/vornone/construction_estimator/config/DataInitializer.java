@@ -17,6 +17,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        // Delete old users if they exist (one-time migration)
+        userRepository.deleteAll();  // Add this line
+
         if(userRepository.count()==0){
             User admin = User.builder()
                     .username("admin")
@@ -26,7 +29,6 @@ public class DataInitializer implements CommandLineRunner {
                     .company("Asymtote")
                     .build();
 
-            // Create contractor user
             User contractor = User.builder()
                     .username("john_contractor")
                     .password(passwordEncoder.encode("contractor"))
@@ -35,7 +37,6 @@ public class DataInitializer implements CommandLineRunner {
                     .company("ABC Construction")
                     .build();
 
-            // Create client user
             User client = User.builder()
                     .username("mary_client")
                     .password(passwordEncoder.encode("client"))
@@ -44,12 +45,13 @@ public class DataInitializer implements CommandLineRunner {
                     .company("Private Client")
                     .build();
 
-            // Save to database
             userRepository.save(admin);
             userRepository.save(contractor);
             userRepository.save(client);
 
             System.out.println("✅ Sample users created!");
-        }else System.out.println("The Data is not Emptied");
+        } else {
+            System.out.println("Users already exist");
+        }
     }
 }
